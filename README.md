@@ -45,12 +45,12 @@ Use this script to create keyspace and tables  used in this poc:
      
 2. Spring Batch needs a job repository to configure and maintain the batch jobs progress and status. Configure below properties 
 
-    spring.datasource.url=jdbc:h2:mem:testdb
-	spring.datasource.driverClassName=org.h2.Driver
-	spring.datasource.initialize=true
-	spring.batch.initializer.enabled=false
-	spring.batch.job.enabled=false
-	spring.batch.initialize-schema=never
+		    spring.datasource.url=jdbc:h2:mem:testdb
+			spring.datasource.driverClassName=org.h2.Driver
+			spring.datasource.initialize=true
+			spring.batch.initializer.enabled=false
+			spring.batch.job.enabled=false
+			spring.batch.initialize-schema=never
 	
 Even though I have disabled spring batch configuration. It was still looking for datasource url/driver. So added .For  that added h2 dependency too.
 
