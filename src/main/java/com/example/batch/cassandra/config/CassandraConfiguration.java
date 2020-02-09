@@ -14,7 +14,7 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 
 
 @Configuration
-@EnableCassandraRepositories(basePackages = "com.sbux.springboot.h2")
+@EnableCassandraRepositories
 public class CassandraConfiguration extends AbstractCassandraConfiguration{
 
     private static final Logger LOG = LoggerFactory.getLogger(CassandraConfiguration.class);
