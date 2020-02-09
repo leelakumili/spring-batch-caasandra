@@ -56,13 +56,16 @@ Even though I have disabled spring batch configuration. It was still looking for
 
 3. Refer to CustomBatchConfigurer, where configure map job repository 
 
-			            MapJobRepositoryFactoryBean jobRepositoryFactory = new 		MapJobRepositoryFactoryBean( this.transactionManager );
+			MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean( this.transactionManager );
             jobRepositoryFactory.afterPropertiesSet();
             this.jobRepository = jobRepositoryFactory.getObject();
+            
 4. Refer to CassandraConfiguration where cassandra connection and keyspaces are configured. This establishes connection to configured cassandra DB. 
 
 
-5. Disabled spring batch auto execution on startup "spring.batch.job.enabled=false".
+5. Disabled spring batch auto execution on startup "spring.batch.job.enabled=false". 
+
+		Note: I tried to configure spring batch to use my cassandra as job repository too. For that I have extend and implement own Driver and Dialect as batch uses hibernate ORM to create and maintain job repository. Instead manintaing 2 data source one for job repo and another for actual application disabled for now. 
 
 6. Create a batch job with 2 steps: First step, will load data from CSV and write to member table , Second step will read data from member table and write to member_duplicate table.
 
@@ -105,5 +108,6 @@ Even though I have disabled spring batch configuration. It was still looking for
     }
 
 8. Invoke the batch job using Rest api get call: "http://localhost:8080/run-member-job"
+
 
 
