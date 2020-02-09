@@ -48,9 +48,6 @@ Use this script to create keyspace and tables  used in this poc:
     spring.datasource.url=jdbc:h2:mem:testdb
 	spring.datasource.driverClassName=org.h2.Driver
 	spring.datasource.initialize=true
-
-
-	# SPRING BATCH (BatchDatabaseInitializer)
 	spring.batch.initializer.enabled=false
 	spring.batch.job.enabled=false
 	spring.batch.initialize-schema=never
@@ -67,9 +64,46 @@ Even though I have disabled spring batch configuration. It was still looking for
 
 5. Disabled spring batch auto execution on startup "spring.batch.job.enabled=false".
 
-6. Add a controller which will batch job.
+6. Create a batch job with 2 steps: First step, will load data from CSV and write to member table , Second step will read data from member table and write to member_duplicate table.
 
-7. My batch has 2 steps, each step have a reader and writer.
+		@Bean(name="loadMemberJob")
+    public Job newSchemaJob(final JobBuilderFactory jobs, @Qualifier("loadStep") final Step s1, @Qualifier("maskedStep")final Step s2, final JobExecutionListener listener) {
+        return jobs.get("newSchemaJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .start(s1)
+                .next(s2)
+                .build();
+    }
 
- 			
+7. Configure Both steps as shown below
+
+
+  
+    				@Bean
+    				@Qualifier("loadStep")
+    				public Step stepOne(final StepBuilderFactory stepBuilderFactory, final ItemProcessor processor, final ItemWriter<Member> writer) {
+        Step s1= stepBuilderFactory.get("stepOne").<Member, Member>chunk(10)
+                .reader(new MemberCsvReader(resource))
+                .writer(memberDBWriter)
+                .build();
+
+        return s1;
+    }
+    
+    @Bean
+    @Qualifier("maskedStep")
+    public Step stepTwo(final StepBuilderFactory stepBuilderFactory, final ItemProcessor processor, final ItemWriter<MemberDuplicate> writer) {
+        SimpleStepBuilder stepsBuilder = stepBuilderFactory.get("stepTwo").<Member, MemberDuplicate>chunk(10)
+                .reader(memberDBReader)
+                .processor(processor)
+                .writer(maskedMemberWriter);
+
+        stepsBuilder.allowStartIfComplete(true);
+        Step s2 = stepsBuilder.build();
+        return s2;
+    }
+
+8. Invoke the batch job using Rest api get call: "http://localhost:8080/run-member-job"
+
 
