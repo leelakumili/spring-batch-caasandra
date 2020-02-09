@@ -67,7 +67,7 @@ Even though I have disabled spring batch configuration. It was still looking for
 6. Create a batch job with 2 steps: First step, will load data from CSV and write to member table , Second step will read data from member table and write to member_duplicate table.
 
 		@Bean(name="loadMemberJob")
-    public Job newSchemaJob(final JobBuilderFactory jobs, @Qualifier("loadStep") final Step s1, @Qualifier("maskedStep")final Step s2, final JobExecutionListener listener) {
+        public Job newSchemaJob(final JobBuilderFactory jobs, @Qualifier("loadStep") final Step s1, @Qualifier("maskedStep")final Step s2, final JobExecutionListener listener) {
         return jobs.get("newSchemaJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
@@ -91,17 +91,17 @@ Even though I have disabled spring batch configuration. It was still looking for
         return s1;
     }
     
-    @Bean
-    @Qualifier("maskedStep")
-    public Step stepTwo(final StepBuilderFactory stepBuilderFactory, final ItemProcessor processor, final ItemWriter<MemberDuplicate> writer) {
+                @Bean
+               @Qualifier("maskedStep")
+               public Step stepTwo(final StepBuilderFactory stepBuilderFactory, final ItemProcessor processor, final ItemWriter<MemberDuplicate> writer) {
         SimpleStepBuilder stepsBuilder = stepBuilderFactory.get("stepTwo").<Member, MemberDuplicate>chunk(10)
                 .reader(memberDBReader)
                 .processor(processor)
                 .writer(maskedMemberWriter);
 
-        stepsBuilder.allowStartIfComplete(true);
-        Step s2 = stepsBuilder.build();
-        return s2;
+                 stepsBuilder.allowStartIfComplete(true);
+                Step s2 = stepsBuilder.build();
+               return s2;
     }
 
 8. Invoke the batch job using Rest api get call: "http://localhost:8080/run-member-job"
